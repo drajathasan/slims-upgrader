@@ -1,0 +1,21 @@
+{
+    "name": "drajathasan/slims_upgrader",
+    "description": "SLiMS Upgrader",
+    "type": "slims-plugin",
+    "license": "GPL-3.0",
+    "autoload": {
+        "psr-4": {
+            "Drajathasan\\SlimsUpgrader\\": "src/",
+            "SLiMS\\Http\\": "src/Http/"
+        },
+	"files": ["helper.php"]
+    },
+    "authors": [
+        {
+            "name": "Drajat Hasan",
+            "email": "drajathasan20@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
