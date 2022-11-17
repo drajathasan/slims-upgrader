@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-16 15:52:51
+ * @modify date 2022-11-18 00:20:02
  * @license GPLv3
  * @desc [description]
  */
@@ -22,47 +22,49 @@ require SB . 'admin/default/session.inc.php';
 require SB . 'admin/default/session_check.inc.php';
 require __DIR__ . '/../vendor/autoload.php';
 
+// Ignited engine
+$engine = new Drajathasan\SlimsUpgrader\Engine('https://api.github.com');
+
 if (isset($_GET['branch']) && isset($_GET['check']))
 {
+    /**
+     * Get new feature
+     */
     $branch = simbio_security::xssFree($_GET['branch']);
-    $client = Client::init('https://api.github.com');
-    $message = '';
-    $compare = [];
-    $lastVersion = SENAYAN_VERSION_TAG;
-
-    try {
-        // Check latest version
-        $lastVersion = checkLatestVersion($client, $branch);
-
-        // compare version
-        $compare = compareVersion($client, $branch);
-        if (!$compare['status']) throw new Exception($compare['message']);
-        
-    } catch (Exception $e) {
-        $message = $e->getMessage();
-    }
+    list($lastVersion, $compare, $message) = $engine->getNewUpdate($branch);
     
     ob_start();
     
     if (!empty($message)) list($type, $message) = explode('::', $message);
     
+    /**
+     * Generate output based on type
+     */
     generateTemplate($type??'newUpdate', ['message' => $message, 'result' => $compare, 'lastVersion' => $lastVersion]);
 
     $content = ob_get_clean();
+
+    // parse to template
     include SB . 'admin/admin_template/notemplate_page_tpl.php';
     exit;
 }
 
 if (isset($_GET['upgrade']))
 {
-    ob_start();
+    echo '<div style="font: 14px Menlo, Monaco, Consolas, monospace;background-color: #18171B; min-height: 500px;padding: 20px;">';
     if (empty($_GET['from']) || empty($_GET['to']))
     {
+        ob_start();
         generateTemplate('danger', ['message' => 'Permintaan tidak valid']);
+        $content = ob_get_clean();
+        include SB . 'admin/admin_template/notemplate_page_tpl.php';
+        exit;
     }
-
-    $content = ob_get_clean();
-    include SB . 'admin/admin_template/notemplate_page_tpl.php';
+    else
+    {
+        $engine->doUpgrade($_GET['branch'], $_GET['from'], $_GET['to']);
+    }
+    echo '</div>';
     exit;
 }
 

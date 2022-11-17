@@ -8,39 +8,6 @@ if (!function_exists('selfUrl'))
     }
 }
 
-if (!function_exists('getLatestVersion'))
-{
-    function checkLatestVersion($client, $branch)
-    {
-        // Rolling release
-        if ($branch === 'develop') return 'develop';
-
-        // get from github api
-        $latest = $client->get('/repos/slims/slims9_bulian/releases/latest');
-        if ($latest->getStatusCode() != 200) throw new Exception('danger::' . $latest->getError()); // set error
-
-        // set data
-        $data = $latest->toArray();
-        if (SENAYAN_VERSION_TAG === $data['tag_name']) throw new Exception('info::SLiMS anda sudah paling baru');
-        
-        // return latest release
-        return $data['tag_name'];
-    }
-}
-
-if (!function_exists('compareVersion'))
-{
-    function compareVersion($client, $branch)
-    {
-        // Comparing data with current senayan tag and inputed branch
-        $compare = $client->get('/repos/slims/slims9_bulian/compare/'.SENAYAN_VERSION_TAG . '...' . $branch);
-        if ($compare->getStatusCode() != 200) return ['status' => false, 'message' => $compare->getError()];
-
-        // back to outside
-        return ['status' => true, 'data' => $compare->toArray()];
-    }
-}
-
 if (!function_exists('generateTemplate'))
 {
     function generateTemplate($type, $data = [])
@@ -54,6 +21,7 @@ if (!function_exists('generateTemplate'))
                 echo '<input type="hidden" name="mod" value="' . simbio_security::xssFree($_GET['mod']) . '"/>';
                 echo '<input type="hidden" name="from" value="' . simbio_security::xssFree(SENAYAN_VERSION_TAG) . '"/>';
                 echo '<input type="hidden" name="to" value="' . simbio_security::xssFree($lastVersion) . '"/>';
+                echo '<input type="hidden" name="branch" value="' . simbio_security::xssFree($_GET['branch']) . '"/>';
                 echo '<p style="font-size: 12pt">versi anda <code>'.SENAYAN_VERSION_TAG.'</code> akan di perbaharui ke <code>'.$lastVersion.'</code></p>';
                 echo '<input type="submit" name="upgrade" class="btn btn-primary" value="Tingkatkan"/>';
                 echo '<table class="table my-2">';

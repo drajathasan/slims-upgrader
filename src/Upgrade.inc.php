@@ -1047,11 +1047,12 @@ ADD INDEX (  `input_date` ,  `last_update` ,  `uid` ) ;";
     }
 
     /**
-     * Upgrade role to v9.x.x
+     * Upgrade role to v9.5.1
      */
     function upgrade_role_32()
     {
-        $sql['alter'][] = 'ALTER TABLE `s95`.`search_biblio` DROP INDEX `title`, ADD FULLTEXT `title` (`title`, `series_title`)';
+        $sql['alter'][] = 'ALTER TABLE `search_biblio` DROP INDEX `title`, ADD FULLTEXT `title` (`title`, `series_title`)';
+        return $this->slims->query($sql, ['alter']);
     }
 
 }
