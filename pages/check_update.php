@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-18 00:20:02
+ * @modify date 2022-11-19 00:41:21
  * @license GPLv3
  * @desc [description]
  */
@@ -51,7 +51,8 @@ if (isset($_GET['branch']) && isset($_GET['check']))
 
 if (isset($_GET['upgrade']))
 {
-    echo '<div style="font: 14px Menlo, Monaco, Consolas, monospace;background-color: #18171B; min-height: 500px;padding: 20px;">';
+    // Start with black board verbose area
+    echo '<div id="verbose" style="font: 14px Menlo, Monaco, Consolas, monospace;background-color: #18171B; min-height: 1000px;padding: 20px;">';
     if (empty($_GET['from']) || empty($_GET['to']))
     {
         ob_start();
@@ -62,7 +63,10 @@ if (isset($_GET['upgrade']))
     }
     else
     {
+        echo '<div style="height: 1000px; overflow-y: auto;">';
+        $engine->setSystemEnv('development');
         $engine->doUpgrade($_GET['branch'], $_GET['from'], $_GET['to']);
+        echo '</div>';
     }
     echo '</div>';
     exit;
@@ -85,16 +89,34 @@ if (isset($_GET['upgrade']))
             </select>
             <input class="btn btn-primary" type="submit" name="check" value="<?= __('Check') ?>"/>
         </form>
+        <div id="simpleDetail" class="d-none">
+            <span id="ProgressStatus"></span>
+            <div class="progress my-3">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+            </div>
+            <button id="showDetail" class="btn btn-secondary btn-sm">Lihat proses</button>
+        </div>
     </div>
   </div>
 </div>
-<div id="pleaseWait" class="alert alert-info d-none">
-    <strong>Tunggu sebentar...</strong>
-</div>
-<iframe name="resultIframe" style="height: 100vh"></iframe>
+<iframe id="blackBoard" name="resultIframe" class="d-none" style="height: 100vh"></iframe>
 <script>
     $('#upgrade').submit(function(){
-        toastr.info('Tunggu', 'Proses sedang berjalan');
-        console.log($('iframe[name="resultIframe"]'));
-    })
+        $('iframe[name="resultIframe"]').removeClass('d-none');
+    });
+    $('#showDetail').click(function(){
+        $(this).html('Tutup detail')
+        $(this).addClass('show')
+
+        let iframe = $('#blackBoard')
+        console.log(iframe)
+        if (!$(this).hasClass('show'))
+        {
+            iframe.removeClass('d-none')
+        }
+        else
+        {
+            iframe.addClass('d-none')
+        }
+    });
 </script>

@@ -80,7 +80,7 @@ class Upgrade
   {
     // run before script
     $this->hookBeforeUpgrade();
-
+    
     $raw_err = [];
     for ($i = ($version + 1); $i <= $this->version; $i++) {
       $method = 'upgrade_role_' . $i;

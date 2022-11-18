@@ -3,13 +3,14 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-18 01:18:15
+ * @modify date 2022-11-19 00:31:12
  * @license GPLv3
  * @desc [description]
  */
 
 namespace Drajathasan\SlimsUpgrader;
 
+use Exception;
 use SLiMS\Json;
 use SLiMS\Http\Client;
 
@@ -25,12 +26,23 @@ class Engine
         $this->createConnection();
     }
 
+    /**
+     * Create http client instance
+     *
+     * @return void
+     */
     private function createConnection()
     {
         $this->client = Client::init($this->uri);
     }
 
-    public function getNewUpdate($branch)
+    /**
+     * Get lastest update
+     *
+     * @param [type] $branch
+     * @return array
+     */
+    public function getNewUpdate(string $branch):Array
     {
         $message = '';
         $compare = [];
@@ -51,8 +63,15 @@ class Engine
         return [$lastVersion, $compare, $message];
     }
 
-    public function doUpgrade($branch, $from, $to)
+    /**
+     * @param string $branch
+     * @param string $from
+     * @param string $to
+     * @return void
+     */
+    public function doUpgrade(string $branch, string $from, string $to):void
     {
+        $this->turnOffVerbose();
         try {
             // Check latest version
             $lastVersion = $this->checkLatestVersion($branch);
@@ -84,6 +103,7 @@ class Engine
                 $this->migrate($index, $from, $download, $newUpdate['filename'], $newUpdate['status']);
 
                 // Show output
+                $this->setPercentProgress(($index + 1), $total);
                 $this->showMessage($index);
 
                 if ($total == ($index + 1)) $this->outputWithFlush('<strong style="padding: 10px; color: green">Selesai mendownload</strong></br>');
@@ -98,14 +118,50 @@ class Engine
         }
     }
 
-    private function migrate($index, $currentTag, $download, $destination, $status)
+    /**
+     * this is not SLiMS environment
+     * its just on if upgrade process is on
+     *
+     * @param string $env
+     * @return void
+     */
+    public function setSystemEnv(string $env)
+    {
+        switch ($env) {
+            case 'development':
+              @error_reporting(-1);
+              @ini_set('display_errors', true);
+              break;
+            case 'production':
+              @ini_set('display_errors', false);
+              @error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+              break;
+            default:
+              header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+              echo 'The application environment is not set correctly.';
+              exit(1); // EXIT_ERROR
+        }
+    }
+
+    /**
+     * Migrating file
+     *
+     * @param integer $index
+     * @param string $currentTag
+     * @param object $download
+     * @param string $destination
+     * @param string $status
+     * @return void
+     */
+    private function migrate(int $index, string $currentTag, object $download, string $destination, string $status)
     {
         try {
             // new or update
             if (in_array($status, ['modified','added']))
             {
                 // be safe and make a backup
-                copy(SB . $destination, SB . $destination . $currentTag);
+                $originalPath = SB . $destination;
+                if (file_exists($originalPath)) copy($originalPath, $originalPath . $currentTag);
                 
                 if ($status == 'added' && !file_exists($path = dirname(SB . $destination))) $this->mkdir($path . DS);
 
@@ -122,6 +178,12 @@ class Engine
         }
     }
 
+    /**
+     * Upgrade current database
+     *
+     * @param string $previousVersion
+     * @return void
+     */
     private function upgradeDatabase(string $previousVersion)
     {
         $this->outputWithFlush('<div style="color: lightblue"><strong>Meningkatkan basis data</strong></div>');
@@ -134,26 +196,54 @@ class Engine
 
         if ($version == 0) exit($this->outputWithFlush('<div style="padding: 10px; color: red">Versi SLiMS anda tidak diketahui!</div>'));
 
-        $slims = new \SLiMS();
+        $slims = new \Install\SLiMS();
+        $slims->createConnection();
         $upgrade = \Install\Upgrade::init($slims)->from($version);
         if (count($upgrade) > 0) $this->outputWithFlush('<div style="padding: 10px; color: red">' . $upgrade . '</div>');
         
     }
 
+    /**
+     * Make directory
+     *
+     * @param string $path
+     * @return void
+     */
     private function mkdir(string $path)
     {
         mkdir($path, 0777, true);
     }
 
+    /**
+     * Show output message
+     *
+     * @param [type] $index
+     * @return void
+     */
     private function showMessage($index)
     {
         $message = '<strong style="padding: 10px; color: ' . 
                 ($this->cache[$index]['download_status'] ? 'green' : 'red') . '">' . 
                 ($this->cache[$index]['download_status'] ? 'Sukses mengupdate : ' . $this->cache[$index]['to'] : 'Gagal : ' . $this->cache[$index]['error_message']) . 
             '</strong></br>';
-        $this->outputWithFlush($message);
+        $js = <<<HTML
+        <script>
+            if (parent.$('#simpleDetail').hasClass('d-none'))
+            {
+                parent.$('#simpleDetail').removeClass('d-none')
+            }
+            parent.$('#ProgressStatus').html('{$message}')
+        </script>
+        HTML;
+        $this->outputWithFlush($message . $js);
     }
 
+    /**
+     * Flush output process
+     *
+     * @param string $message
+     * @return void
+     */
     private function outputWithFlush(string $message = '')
     {
         echo $message;
@@ -164,14 +254,55 @@ class Engine
                     top: document.body.scrollHeight,
                     behavior: "smooth"
                 }); 
-            }, 2000);
+            }, 500);
         </script>
         HTML;
         ob_flush();
         flush();
     }
 
-    private function checkLatestVersion($branch)
+    /**
+     * Set progress precentation
+     *
+     * @param integer $currentStep
+     * @param integer $totalStep
+     * @return void
+     */
+    public function setPercentProgress(int $currentStep, int $totalStep)
+    {
+        $percent = round(($currentStep / $totalStep) * 100);
+        echo <<<HTML
+        <script>
+            var progressBar = parent.document.querySelector('.progress-bar');
+            progressBar.setAttribute('style', 'width: {$percent}%');
+            progressBar.innerHTML = '{$percent}%';
+        </script>
+        HTML;
+    }
+
+    public function turnOffVerbose(bool $status = true)
+    {
+        if ($status)
+        {
+            echo <<<HTML
+            <script>
+                parent.$('input[name="check"]').attr('disabled', 'true');
+                parent.$('iframe[name="resultIframe"]').addClass('d-none');
+            </script>
+            HTML;
+            ob_flush();
+            flush();
+        }
+    }
+
+    /**
+     * Check latest version
+     * from github
+     *
+     * @param string $branch
+     * @return string
+     */
+    private function checkLatestVersion(string $branch):string
     {
         // Rolling release
         if ($branch === 'develop') return 'develop';
@@ -188,7 +319,11 @@ class Engine
         return $data['tag_name'];
     }
 
-    private function compareVersion($branch)
+    /**
+     * @param string $branch
+     * @return array
+     */
+    private function compareVersion(string $branch):array
     {
         // Comparing data with current senayan tag and inputed branch
         $compare = $this->client->get('/repos/slims/slims9_bulian/compare/'.SENAYAN_VERSION_TAG . '...' . $branch);

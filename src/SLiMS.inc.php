@@ -215,14 +215,9 @@ class SLiMS
     return $mix_input;
   }
 
-  function createConnection($host, $port = '3306', $user, $pass = '', $name = null)
+  function createConnection()
   {
-    if (is_null($this->db)) {
-        $this->db = @new mysqli($host, $user, $pass, $name, $port);
-    }
-    if (mysqli_connect_error()) {
-      throw new Exception("Error Connecting to Database with message: ".mysqli_connect_error());
-    }
+    $this->db = \SLiMS\DB::getInstance('mysqli');
     return $this->db;
   }
 
