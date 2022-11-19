@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-19 00:41:21
+ * @modify date 2022-11-19 07:32:47
  * @license GPLv3
  * @desc [description]
  */
@@ -52,7 +52,7 @@ if (isset($_GET['branch']) && isset($_GET['check']))
 if (isset($_GET['upgrade']))
 {
     // Start with black board verbose area
-    echo '<div id="verbose" style="font: 14px Menlo, Monaco, Consolas, monospace;background-color: #18171B; min-height: 1000px;padding: 20px;">';
+    echo '<div id="verbose" style="font: 14px Menlo, Monaco, Consolas, monospace;background-color: #18171B; height: 500px;padding: 20px;overflow-y: auto;">';
     if (empty($_GET['from']) || empty($_GET['to']))
     {
         ob_start();
@@ -63,10 +63,8 @@ if (isset($_GET['upgrade']))
     }
     else
     {
-        echo '<div style="height: 1000px; overflow-y: auto;">';
         $engine->setSystemEnv('development');
         $engine->doUpgrade($_GET['branch'], $_GET['from'], $_GET['to']);
-        echo '</div>';
     }
     echo '</div>';
     exit;
@@ -104,13 +102,16 @@ if (isset($_GET['upgrade']))
     $('#upgrade').submit(function(){
         $('iframe[name="resultIframe"]').removeClass('d-none');
     });
+    $('.showFlush').click(function(){
+        $('iframe[name="resultIframe"]').removeClass('d-none');
+    });
     $('#showDetail').click(function(){
         $(this).html('Tutup detail')
         $(this).addClass('show')
 
         let iframe = $('#blackBoard')
-        console.log(iframe)
-        if (!$(this).hasClass('show'))
+        
+        if (iframe.hasClass('d-none'))
         {
             iframe.removeClass('d-none')
         }

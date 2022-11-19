@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-19 00:31:12
+ * @modify date 2022-11-19 07:35:31
  * @license GPLv3
  * @desc [description]
  */
@@ -16,6 +16,8 @@ use SLiMS\Http\Client;
 
 class Engine
 {
+    use Guard, Permission;
+    
     private string $uri = '';
     private $client = null;
     private $cache = [];
@@ -86,6 +88,8 @@ class Engine
             // total downloaded file
             $total = count($new['data']['files']);
 
+            $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh dan memasang berkas pembaharuan</strong></br>');
+
             $this->cache = [];
             foreach ($new['data']['files'] as $index => $newUpdate) {
                 // Make a cache
@@ -108,12 +112,18 @@ class Engine
 
                 if ($total == ($index + 1)) $this->outputWithFlush('<strong style="padding: 10px; color: green">Selesai mendownload</strong></br>');
             }
+            $this->progressMessage('<strong style="padding: 10px; color: black">Selesai memasang pembaharuan</strong></br>');
+            sleep(2);
+            $this->progressMessage('<strong style="padding: 10px; color: black">Memperbaharui basis data</strong></br>');
 
             $this->upgradeDatabase($from);
 
+            $this->progressMessage('<strong style="padding: 10px; color: black">Selesai memperbaharui basis data</strong></br>');
             $this->outputWithFlush('<strong style="padding: 10px; color: green">Selesai memperbaharui basis data</strong></br>');
+            $this->progressMessage('<strong style="padding: 10px; color: green">Selesai memperbaharui SLiMS</strong></br>');
             
         } catch (\Exception $e) {
+            $this->progressMessage('<strong style="padding: 10px; color: red">' . $e->getMessage() . '</strong></br>');
             generateTemplate('danger', ['message' => $e->getMessage()]);
         }
     }
@@ -232,10 +242,20 @@ class Engine
             {
                 parent.$('#simpleDetail').removeClass('d-none')
             }
-            parent.$('#ProgressStatus').html('{$message}')
         </script>
         HTML;
         $this->outputWithFlush($message . $js);
+    }
+
+    private function progressMessage($stepMessage)
+    {
+        $message = <<<HTML
+        <script>
+            parent.$('#ProgressStatus').html('{$stepMessage}')
+        </script>
+        HTML;
+
+        $this->outputWithFlush($message);
     }
 
     /**
