@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-20 17:40:46
+ * @modify date 2022-11-20 17:46:21
  * @license GPLv3
  * @desc [description]
  */
@@ -30,7 +30,7 @@ if (isset($_GET['branch']) && isset($_GET['check']))
     /**
      * Get new feature
      */
-    $branch = simbio_security::xssFree($_GET['branch']);
+    $branch = xssFree($_GET['branch']);
     list($lastVersion, $compare, $message) = $engine->getNewUpdate($branch);
     
     ob_start();
@@ -78,8 +78,8 @@ if (isset($_GET['upgrade']))
     </div>
     <div class="sub_section">
         <form id="upgrade" action="<?= selfUrl() ?>" target="resultIframe" id="search" method="get" class="form-inline">
-            <input type="hidden" name="id" value="<?= simbio_security::xssFree($_GET['id']) ?>"/>
-            <input type="hidden" name="mod" value="<?= simbio_security::xssFree($_GET['mod']) ?>"/>
+            <input type="hidden" name="id" value="<?= xssFree($_GET['id']) ?>"/>
+            <input type="hidden" name="mod" value="<?= xssFree($_GET['mod']) ?>"/>
             Dari cabang : &nbsp;&nbsp;&nbsp;
             <select name="branch" class="form-control">
                 <option value="master"><?= __('Stable') ?></option>
