@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-19 07:35:31
+ * @modify date 2022-11-20 15:59:45
  * @license GPLv3
  * @desc [description]
  */
@@ -16,7 +16,7 @@ use SLiMS\Http\Client;
 
 class Engine
 {
-    use Guard, Permission;
+    use Guard, Permission, Utils;
     
     private string $uri = '';
     private $client = null;
@@ -75,6 +75,9 @@ class Engine
     {
         $this->turnOffVerbose();
         try {
+            // Writable scandir
+            $this->checkPermissions(SB);
+
             // Check latest version
             $lastVersion = $this->checkLatestVersion($branch);
 
@@ -120,7 +123,8 @@ class Engine
 
             $this->progressMessage('<strong style="padding: 10px; color: black">Selesai memperbaharui basis data</strong></br>');
             $this->outputWithFlush('<strong style="padding: 10px; color: green">Selesai memperbaharui basis data</strong></br>');
-            $this->progressMessage('<strong style="padding: 10px; color: green">Selesai memperbaharui SLiMS</strong></br>');
+            $this->progressMessage('<strong style="padding: 10px; color: green">Selesai memperbaharui SLiMS, anda akan logout dalam 5 detik</strong></br>');
+            $this->logOut();
             
         } catch (\Exception $e) {
             $this->progressMessage('<strong style="padding: 10px; color: red">' . $e->getMessage() . '</strong></br>');
@@ -211,108 +215,6 @@ class Engine
         $upgrade = \Install\Upgrade::init($slims)->from($version);
         if (count($upgrade) > 0) $this->outputWithFlush('<div style="padding: 10px; color: red">' . $upgrade . '</div>');
         
-    }
-
-    /**
-     * Make directory
-     *
-     * @param string $path
-     * @return void
-     */
-    private function mkdir(string $path)
-    {
-        mkdir($path, 0777, true);
-    }
-
-    /**
-     * Show output message
-     *
-     * @param [type] $index
-     * @return void
-     */
-    private function showMessage($index)
-    {
-        $message = '<strong style="padding: 10px; color: ' . 
-                ($this->cache[$index]['download_status'] ? 'green' : 'red') . '">' . 
-                ($this->cache[$index]['download_status'] ? 'Sukses mengupdate : ' . $this->cache[$index]['to'] : 'Gagal : ' . $this->cache[$index]['error_message']) . 
-            '</strong></br>';
-        $js = <<<HTML
-        <script>
-            if (parent.$('#simpleDetail').hasClass('d-none'))
-            {
-                parent.$('#simpleDetail').removeClass('d-none')
-            }
-        </script>
-        HTML;
-        $this->outputWithFlush($message . $js);
-    }
-
-    private function progressMessage($stepMessage)
-    {
-        $message = <<<HTML
-        <script>
-            parent.$('#ProgressStatus').html('{$stepMessage}')
-        </script>
-        HTML;
-
-        $this->outputWithFlush($message);
-    }
-
-    /**
-     * Flush output process
-     *
-     * @param string $message
-     * @return void
-     */
-    private function outputWithFlush(string $message = '')
-    {
-        echo $message;
-        echo <<<HTML
-        <script>
-            setTimeout(() => {
-                scroll({
-                    top: document.body.scrollHeight,
-                    behavior: "smooth"
-                }); 
-            }, 500);
-        </script>
-        HTML;
-        ob_flush();
-        flush();
-    }
-
-    /**
-     * Set progress precentation
-     *
-     * @param integer $currentStep
-     * @param integer $totalStep
-     * @return void
-     */
-    public function setPercentProgress(int $currentStep, int $totalStep)
-    {
-        $percent = round(($currentStep / $totalStep) * 100);
-        echo <<<HTML
-        <script>
-            var progressBar = parent.document.querySelector('.progress-bar');
-            progressBar.setAttribute('style', 'width: {$percent}%');
-            progressBar.innerHTML = '{$percent}%';
-        </script>
-        HTML;
-    }
-
-    public function turnOffVerbose(bool $status = true)
-    {
-        if ($status)
-        {
-            echo <<<HTML
-            <script>
-                parent.$('input[name="check"]').attr('disabled', 'true');
-                parent.$('iframe[name="resultIframe"]').addClass('d-none');
-            </script>
-            HTML;
-            ob_flush();
-            flush();
-        }
     }
 
     /**

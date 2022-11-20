@@ -22,7 +22,7 @@ if (!function_exists('generateTemplate'))
                 echo '<input type="hidden" name="from" value="' . simbio_security::xssFree(SENAYAN_VERSION_TAG) . '"/>';
                 echo '<input type="hidden" name="to" value="' . simbio_security::xssFree($lastVersion) . '"/>';
                 echo '<input type="hidden" name="branch" value="' . simbio_security::xssFree($_GET['branch']) . '"/>';
-                echo '<p style="font-size: 12pt">versi anda <code>'.SENAYAN_VERSION_TAG.'</code> akan di perbaharui ke <code>'.$lastVersion.'</code></p>';
+                echo '<p style="font-size: 12pt">versi anda <code>'.SENAYAN_VERSION_TAG.'</code> akan diperbaharui ke <code>'.$lastVersion.'</code></p>';
                 echo '<input type="submit" name="upgrade" class="btn btn-primary" value="Tingkatkan"/>';
                 echo '<table class="table my-2">';
                 echo '<tbody>';

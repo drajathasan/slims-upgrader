@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-19 07:32:47
+ * @modify date 2022-11-20 17:40:46
  * @license GPLv3
  * @desc [description]
  */
@@ -52,7 +52,7 @@ if (isset($_GET['branch']) && isset($_GET['check']))
 if (isset($_GET['upgrade']))
 {
     // Start with black board verbose area
-    echo '<div id="verbose" style="font: 14px Menlo, Monaco, Consolas, monospace;background-color: #18171B; height: 500px;padding: 20px;overflow-y: auto;">';
+    echo '<div id="verbose" style="font: 14px Menlo, Monaco, Consolas, monospace;background-color: #18171B; min-height: 500px;padding: 20px;">';
     if (empty($_GET['from']) || empty($_GET['to']))
     {
         ob_start();
@@ -74,18 +74,18 @@ if (isset($_GET['upgrade']))
 <div class="menuBox">
   <div class="menuBoxInner systemIcon">
     <div class="per_title">
-      <h2><?php echo __('Check Update'); ?></h2>
+      <h2>Periksa Pembaharuan</h2>
     </div>
     <div class="sub_section">
         <form id="upgrade" action="<?= selfUrl() ?>" target="resultIframe" id="search" method="get" class="form-inline">
             <input type="hidden" name="id" value="<?= simbio_security::xssFree($_GET['id']) ?>"/>
             <input type="hidden" name="mod" value="<?= simbio_security::xssFree($_GET['mod']) ?>"/>
-            <?php echo __('From'); ?>&nbsp;&nbsp;&nbsp;
+            Dari cabang : &nbsp;&nbsp;&nbsp;
             <select name="branch" class="form-control">
                 <option value="master"><?= __('Stable') ?></option>
                 <option value="develop"><?= __('Development') ?></option>
             </select>
-            <input class="btn btn-primary" type="submit" name="check" value="<?= __('Check') ?>"/>
+            <input class="btn btn-secondary" type="submit" name="check" value="Cek"/>
         </form>
         <div id="simpleDetail" class="d-none">
             <span id="ProgressStatus"></span>
@@ -96,27 +96,36 @@ if (isset($_GET['upgrade']))
         </div>
     </div>
   </div>
+  <div id="alert" class="d-none"></div>
 </div>
 <iframe id="blackBoard" name="resultIframe" class="d-none" style="height: 100vh"></iframe>
 <script>
+    if (!navigator.onLine)
+    {
+        $('#alert').removeClass('d-none')
+        $('#alert').addClass('errorBox my-3 w-full d-block')
+        $('#alert').html('<strong>Anda tidak terkoneksi dengan internet! Plugin ini membutuhkan akses internet.</strong>')
+        $('input[name="check"]').attr('disabled', 'true')
+    }
+
     $('#upgrade').submit(function(){
         $('iframe[name="resultIframe"]').removeClass('d-none');
+        toastr.info('proses sedang dimulai', 'Tunggu')
     });
     $('.showFlush').click(function(){
         $('iframe[name="resultIframe"]').removeClass('d-none');
     });
     $('#showDetail').click(function(){
-        $(this).html('Tutup detail')
-        $(this).addClass('show')
-
         let iframe = $('#blackBoard')
         
         if (iframe.hasClass('d-none'))
         {
+            $(this).html('Tutup detail')
             iframe.removeClass('d-none')
         }
         else
         {
+            $(this).html('Lihat proses')
             iframe.addClass('d-none')
         }
     });

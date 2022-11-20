@@ -12,4 +12,4 @@
 $plugin = \SLiMS\Plugins::getInstance();
 
 // registering menus or hook
-$plugin->registerMenu("system", 'Check Update', __DIR__ . '/pages/check_update.php');
+$plugin->registerMenu("system", 'Periksa Pembaharuan', __DIR__ . '/pages/check_update.php');
