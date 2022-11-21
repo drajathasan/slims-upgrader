@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 07:34:13
- * @modify date 2022-11-20 16:59:46
+ * @modify date 2022-11-21 15:13:08
  * @license GPLv3
  * @desc [description]
  */
@@ -40,6 +40,62 @@ trait Guard
         }
 
         if (count($isNotWriteAble)) $this->setDirError($isNotWriteAble);
+    }
+
+    private function checkExt()
+    {
+        include_once __DIR__ . '/SLiMS.inc.php';
+        $slims = new \Install\SLiMS();
+        $php_minimum_version = '7.4';
+
+        $data = [
+            'is_pass' => $slims->isPhpOk($php_minimum_version) &&
+                $slims->databaseDriverType() &&
+                $slims->phpExtensionCheck('bool'),
+            'detail' => [
+                'php' => [
+                    'title' => 'PHP Version',
+                    'status' => $slims->isPhpOk($php_minimum_version),
+                    'version' => phpversion(),
+                    'data' => 'Minimum PHP version to install SLiMS is ' . $php_minimum_version . '. Please upgrade it first!'
+                ],
+                'database' => [
+                    'title' => 'Database driver',
+                    'status' => $slims->databaseDriverType(),
+                    'version' => $slims->databaseDriverType(),
+                    'data' => 'SLiMS required MYSQL for database management. Please install it first!'
+                ],
+                'phpextension' => [
+                    'title' => 'PHP Extension',
+                    'status' => '',
+                    'version' => '*',
+                    'data' => $slims->phpExtensionCheck()
+                ],      
+            ]
+        ];
+
+        if (!$data['is_pass'])
+        {
+            $message  = '<div class="w-full">';
+            $message .= '<h2>Galat</h2>';
+            $message .= '<ull>';
+            foreach ($data['detail'] as $section => $detail) {
+                extract($detail);
+                $message .= <<<HTML
+                <li>
+                    <div style="display: flex; flex-direction: column;">
+                        <strong>{$title}</strong>
+                        <p>{$data}</p>
+                    </div>
+                </li>
+                HTML;
+            }
+            $message .= '</ul>';
+            $message .= '</div>';
+
+            throw new \Exception($message);
+        }
+            
     }
 
     private function setDirError($error)

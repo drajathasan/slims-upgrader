@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-20 17:46:21
+ * @modify date 2022-11-21 15:18:58
  * @license GPLv3
  * @desc [description]
  */
@@ -98,7 +98,7 @@ if (isset($_GET['upgrade']))
   </div>
   <div id="alert" class="d-none"></div>
 </div>
-<iframe id="blackBoard" name="resultIframe" class="d-none" style="height: 100vh"></iframe>
+<iframe id="blackBoard" name="resultIframe" class="d-non" style="height: 100vh"></iframe>
 <script>
     if (!navigator.onLine)
     {

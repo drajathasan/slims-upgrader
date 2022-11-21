@@ -23,6 +23,7 @@ if (!function_exists('generateTemplate'))
                 echo '<input type="hidden" name="to" value="' . xssFree($lastVersion) . '"/>';
                 echo '<input type="hidden" name="branch" value="' . xssFree($_GET['branch']) . '"/>';
                 echo '<p style="font-size: 12pt">versi anda <code>'.SENAYAN_VERSION_TAG.'</code> akan diperbaharui ke <code>'.$lastVersion.'</code></p>';
+                echo '<div class="alert alert-warning"><strong style="font-size: 14pt;">Peringatan</strong><br><p style="font-size: 12pt;">sebelum anda meningkatan versi SLiMS anda, pastikan anda sudah melakukan <i>backup</i> database dan source code SLiMS anda saat ini. Keberhasilan proses upgrade bergantung pada koneksi Internet dan stabilitas server anda.</p></div>';
                 echo '<input type="submit" name="upgrade" class="btn btn-primary" value="Tingkatkan"/>';
                 echo '<table class="table my-2">';
                 echo '<tbody>';

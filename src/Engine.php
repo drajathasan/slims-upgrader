@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-20 15:59:45
+ * @modify date 2022-11-21 15:10:09
  * @license GPLv3
  * @desc [description]
  */
@@ -74,40 +74,49 @@ class Engine
     public function doUpgrade(string $branch, string $from, string $to):void
     {
         $this->turnOffVerbose();
+        $this->turnOffMenu();
         try {
+            $this->checkExt();
+            
             // Writable scandir
             $this->checkPermissions(SB);
 
             // Check latest version
             $lastVersion = $this->checkLatestVersion($branch);
 
-            // Get new file
-            $new = $this->compareVersion($branch);
-
+            // no limit
             set_time_limit(0);
+
+            // Get new file
+            $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh data perubahan</strong></br>');
+            $this->downloadDiff($branch);
+            $new = $this->diffParser($branch, SB . 'files/cache/SLiMS.diff');
+
             // Reset last connection
             Client::reset(); $this->createConnection();
 
+            $this->setPercentProgress(0, 0);
+            
             // total downloaded file
-            $total = count($new['data']['files']);
+            $total = count($new);
 
             $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh dan memasang berkas pembaharuan</strong></br>');
 
             $this->cache = [];
-            foreach ($new['data']['files'] as $index => $newUpdate) {
+            foreach ($new as $index => $newUpdate) {
                 // Make a cache
                 $this->cache[$index] = [
-                    'to' => $newUpdate['filename'],
-                    'raw' => $newUpdate['raw_url'],
+                    'to' => $newUpdate['file'],
+                    'raw' => $newUpdate['url'],
                     'changes_status' => $newUpdate['status'],
                     'download_status' => true,
                     'error_message' => ''
                 ];
 
-                $download = Client::download($newUpdate['raw_url']);
+                $download = Client::download($newUpdate['url']);
                 
                 // migrating data
-                $this->migrate($index, $from, $download, $newUpdate['filename'], $newUpdate['status']);
+                $this->migrate($index, $from, $download, $newUpdate['file'], $newUpdate['status']);
 
                 // Show output
                 $this->setPercentProgress(($index + 1), $total);
@@ -124,7 +133,7 @@ class Engine
             $this->progressMessage('<strong style="padding: 10px; color: black">Selesai memperbaharui basis data</strong></br>');
             $this->outputWithFlush('<strong style="padding: 10px; color: green">Selesai memperbaharui basis data</strong></br>');
             $this->progressMessage('<strong style="padding: 10px; color: green">Selesai memperbaharui SLiMS, anda akan logout dalam 5 detik</strong></br>');
-            $this->logOut();
+            // $this->logOut();
             
         } catch (\Exception $e) {
             $this->progressMessage('<strong style="padding: 10px; color: red">' . $e->getMessage() . '</strong></br>');
@@ -202,8 +211,8 @@ class Engine
     {
         $this->outputWithFlush('<div style="color: lightblue"><strong>Meningkatkan basis data</strong></div>');
         
-        include __DIR__ . '/SLiMS.inc.php';
-        include __DIR__ . '/Upgrade.inc.php';
+        include_once __DIR__ . '/SLiMS.inc.php';
+        include_once __DIR__ . '/Upgrade.inc.php';
         $version = array_values(array_filter(require __DIR__ . '/Version.php', function($data) use($previousVersion) {
             if ($data['version'] == $previousVersion) return true;
         }))[0]['value']??'0';
@@ -248,10 +257,19 @@ class Engine
     private function compareVersion(string $branch):array
     {
         // Comparing data with current senayan tag and inputed branch
-        $compare = $this->client->get('/repos/slims/slims9_bulian/compare/'.SENAYAN_VERSION_TAG . '...' . $branch);
+        $compare = $this->client->get('/repos/slims/slims9_bulian/compare/' . SENAYAN_VERSION_TAG . '...' . $branch);
         if ($compare->getStatusCode() != 200) return ['status' => false, 'message' => $compare->getError()];
 
         // back to outside
         return ['status' => true, 'data' => $compare->toArray()];
+    }
+
+    private function downloadDiff(string $branch)
+    {
+        Client::download('https://github.com/slims/slims9_bulian/compare/' . SENAYAN_VERSION_TAG . '...' . $branch . '.diff')
+                ->withProgress(SB . 'files/cache/SLiMS.diff', function($totalSize, $currentSize){
+                    $arguments = round(($currentSize / $totalSize) * 100);
+                    $this->setPercentProgress($currentSize, $totalSize);
+                });
     }
 }
