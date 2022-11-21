@@ -18,7 +18,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "guzzlehttp/guzzle": "7.5.0",
+        "guzzlehttp/guzzle": "^7",
         "nesbot/carbon": "2.63.0"
     },
     "require-dev": {

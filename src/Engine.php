@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-21 15:10:09
+ * @modify date 2022-11-21 22:34:46
  * @license GPLv3
  * @desc [description]
  */
@@ -268,7 +268,6 @@ class Engine
     {
         Client::download('https://github.com/slims/slims9_bulian/compare/' . SENAYAN_VERSION_TAG . '...' . $branch . '.diff')
                 ->withProgress(SB . 'files/cache/SLiMS.diff', function($totalSize, $currentSize){
-                    $arguments = round(($currentSize / $totalSize) * 100);
                     $this->setPercentProgress($currentSize, $totalSize);
                 });
     }
