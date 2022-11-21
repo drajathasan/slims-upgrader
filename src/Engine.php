@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-21 22:34:46
+ * @modify date 2022-11-21 23:25:22
  * @license GPLv3
  * @desc [description]
  */
@@ -91,6 +91,10 @@ class Engine
             $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh data perubahan</strong></br>');
             $this->downloadDiff($branch);
             $new = $this->diffParser($branch, SB . 'files/cache/SLiMS.diff');
+
+            // Download latest
+            $this->downloadLatestPackages($branch);
+            dd(scandir(SB . 'files/cache/'));
 
             // Reset last connection
             Client::reset(); $this->createConnection();
@@ -270,5 +274,16 @@ class Engine
                 ->withProgress(SB . 'files/cache/SLiMS.diff', function($totalSize, $currentSize){
                     $this->setPercentProgress($currentSize, $totalSize);
                 });
+    }
+
+    private function downloadLatestPackages(string $branch)
+    {
+        $path = SB . 'files/cache/' . $branch . '.zip';
+        $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh paket versi terbaru</strong></br>');
+        $this->setPercentProgress(50, 100);
+        Client::download('https://codeload.github.com/slims/slims9_bulian/zip/refs/heads/'.$branch)->to($path);
+        $this->progressMessage('<strong style="padding: 10px; color: black">Mengekstrak paket</strong></br>');
+        $this->unzip($path);
+        $this->setPercentProgress(100, 100);
     }
 }

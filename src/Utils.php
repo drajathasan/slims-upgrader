@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 17:37:00
- * @modify date 2022-11-21 15:11:51
+ * @modify date 2022-11-21 23:17:10
  * @license GPLv3
  * @desc [description]
  */
@@ -116,7 +116,7 @@ trait Utils
      */
     public function setPercentProgress(int $currentStep, int $totalStep)
     {
-        $percent = $currentStep == 0 && $totalStep == 0 ? 0 : round(($currentStep / $totalStep) * 100);
+        $percent = $currentStep == 0 || $totalStep == 0 ? 0 : round(($currentStep / $totalStep) * 100);
         echo <<<HTML
         <script>
             var progressBar = parent.document.querySelector('.progress-bar');
@@ -163,5 +163,16 @@ trait Utils
         echo <<<HTML
         <script>setTimeout(() => top.location.href = '{$url}', 5000)</script>
         HTML;
+    }
+
+    public function unzip(string $path)
+    {
+        $zip = new \ZipArchive;
+        
+        if ($zip->open($path) !== TRUE) throw new \Exception("Gagal mengesktrak file {$path}");
+        
+        $zip->extractTo(SB . 'files' . DS . 'cache' . DS . 'latestVersion' . DS);
+        $zip->close();
+        @unlink($path);
     }
 }
