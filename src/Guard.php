@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 07:34:13
- * @modify date 2022-11-21 15:13:08
+ * @modify date 2022-11-22 22:11:01
  * @license GPLv3
  * @desc [description]
  */
@@ -12,6 +12,12 @@ namespace Drajathasan\SlimsUpgrader;
 
 trait Guard
 {
+    /**
+     * Get all dir content
+     *
+     * @param string $dir
+     * @return void
+     */
     private function getAllDirPath($dir)
     {
         $listOfDir = [];
@@ -28,7 +34,14 @@ trait Guard
         return $listOfDir;
     }
 
-    private function checkPermissions($currentDir)
+    /**
+     * Check directory permission 
+     * recursively
+     *
+     * @param string $currentDir
+     * @return void
+     */
+    private function checkPermissions(string $currentDir)
     {
         $isNotWriteAble = [];
         foreach ($this->getAllDirPath($currentDir . DS) as $directory) {
@@ -42,6 +55,11 @@ trait Guard
         if (count($isNotWriteAble)) $this->setDirError($isNotWriteAble);
     }
 
+    /**
+     * Based on SLiMS Official installer
+     *
+     * @return void
+     */
     private function checkExt()
     {
         include_once __DIR__ . '/SLiMS.inc.php';
@@ -98,6 +116,12 @@ trait Guard
             
     }
 
+    /**
+     * Display directory error
+     *
+     * @param array $error
+     * @return void
+     */
     private function setDirError($error)
     {
         $list = '';
