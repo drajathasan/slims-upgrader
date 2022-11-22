@@ -1,4 +1,5 @@
 <?php
+use Drajathasan\SlimsUpgrader\Html;
 
 if (!function_exists('selfUrl'))
 {
@@ -15,50 +16,54 @@ if (!function_exists('generateTemplate'))
         extract($data);
         switch ($type) {
             case 'newUpdate':
-                echo '<form action="' . selfUrl(['upgrade' => 'yes', 'from' => SENAYAN_VERSION_TAG, 'to' => $lastVersion]) . '">';
-                echo '<h3>Terdapat pembaharuan di cabang ' . strip_tags($_GET['branch']) . '</h3>';
-                echo '<input type="hidden" name="id" value="' . xssFree($_GET['id']) . '"/>';
-                echo '<input type="hidden" name="mod" value="' . xssFree($_GET['mod']) . '"/>';
-                echo '<input type="hidden" name="from" value="' . xssFree(SENAYAN_VERSION_TAG) . '"/>';
-                echo '<input type="hidden" name="to" value="' . xssFree($lastVersion) . '"/>';
-                echo '<input type="hidden" name="branch" value="' . xssFree($_GET['branch']) . '"/>';
-                echo '<p style="font-size: 12pt">versi anda <code>'.SENAYAN_VERSION_TAG.'</code> akan diperbaharui ke <code>'.$lastVersion.'</code></p>';
-                echo '<div class="alert alert-warning"><strong style="font-size: 14pt;">Peringatan</strong><br><p style="font-size: 12pt;">sebelum anda meningkatan versi SLiMS anda, pastikan anda sudah melakukan <i>backup</i> database dan source code SLiMS anda saat ini. Keberhasilan proses upgrade bergantung pada koneksi Internet dan stabilitas server anda.</p></div>';
-                echo '<input type="submit" name="upgrade" class="btn btn-primary" value="Tingkatkan"/>';
-                echo '<table class="table my-2">';
-                echo '<tbody>';
                 $number = 1;
+                $tr = '';
                 foreach ($result['data']['commits'] as $detail) {
                     extract($detail['commit']);
                     extract($detail['author']);
                     $message = ucwords($message);
                     $date = \Carbon\Carbon::parse($author['date'])->locale('id')->isoFormat('dddd, Do MMMM YYYY');
-                    echo <<<HTML
-                    <tr>
-                        <td style="width: 5px">{$number}</td>
-                        <td>
-                            <h6>{$message}</h6>
-                            <div class="d-flex flex-row">
-                                <span class="text-muted">Waktu pembaharuan : </span>
-                                <strong>{$date}</strong>
-                            </div>
-                        </td>
-                    </tr>
-                    HTML;
+                    $tr .= Html::tr(
+                        Html::td($number, ['style' => 'width: 5px']) . 
+                        Html::td(
+                            Html::h6($message) . 
+                            Html::div(
+                                Html::span('Waktu pembaharuan : ', ['class' => 'text-muted']) . 
+                                Html::strong($date),
+                            ['class' => 'd-flex flex-row'])
+                        )
+                    );
                     $number++;
                 }
-                echo '</tbody>';
-                echo '</table>';
-                echo '<button class="btn btn-primary">Tingkatkan</button>';
-                echo '</form>';
+                $table = Html::table(
+                    Html::tbody($tr),
+                ['class' => 'table my-2']);
+
+                echo Html::form(
+                    Html::h3('Terdapat pembaharuan di cabang ' . strip_tags($_GET['branch'])) . 
+                    Html::input(['type' => 'hidden', 'name' => 'id', 'value' => $_GET['id']]) .
+                    Html::input(['type' => 'hidden', 'name' => 'mod', 'value' => $_GET['mod']]) .
+                    Html::input(['type' => 'hidden', 'name' => 'from', 'value' => SENAYAN_VERSION_TAG]) .
+                    Html::input(['type' => 'hidden', 'name' => 'to', 'value' => $lastVersion]) .
+                    Html::input(['type' => 'hidden', 'name' => 'branch', 'value' => $_GET['branch']]) .
+                    Html::p(
+                        'versi anda ' . Html::code(SENAYAN_VERSION_TAG) . ' akan diperbaharui ke ' . Html::code($lastVersion),
+                    ['style' => 'font-size: 12pt']) . 
+                    Html::div(
+                        Html::strong('Peringatan', ['style' => 'font-size: 14pt']) .
+                        Html::br() . 
+                        Html::p('sebelum anda meningkatan versi SLiMS anda, pastikan anda sudah melakukan <i>backup</i> database dan source code SLiMS anda saat ini. Keberhasilan proses upgrade bergantung pada koneksi Internet dan stabilitas server anda.', ['style' => 'font-size: 12pt']),
+                    ['class' => 'alert alert-warning']) . 
+                    Html::input(['type' => 'submit', 'name' => 'upgrade', 'value' => 'Tingkatkan', 'class' => 'btn btn-primary']) . 
+                    $table . 
+                    Html::button('Tingkatakat', ['class' => 'btn btn-primary']),
+                ['action' => selfUrl(['upgrade' => 'yes', 'from' => SENAYAN_VERSION_TAG, 'to' => $lastVersion])]);
                 break;
             
             default:
-                echo <<<HTML
-                    <div class="alert alert-{$type}">
-                        <strong>{$message}</strong>
-                    </div>
-                HTML;
+                echo Html::div(
+                    Html::strong($message),
+                ['class' => 'alert alert-' . $type]);
                 break;
         }
     }

@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 17:37:00
- * @modify date 2022-11-22 10:16:04
+ * @modify date 2022-11-22 11:09:51
  * @license GPLv3
  * @desc [description]
  */
@@ -12,7 +12,7 @@ namespace Drajathasan\SlimsUpgrader;
 
 trait Utils
 {
-    public function diffParser(string $branch, string $filePath)
+    public function diffParse(string $branch, string $filePath)
     {
         $fn = fopen($filePath,"r");
         $result = [];

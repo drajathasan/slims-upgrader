@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-22 10:14:43
+ * @modify date 2022-11-22 16:08:09
  * @license GPLv3
  * @desc [description]
  */
@@ -16,8 +16,13 @@ use SLiMS\Http\Client;
 
 class Engine
 {
-    use Guard, Permission, Utils;
+    use Guard,Utils;
     
+    /**
+     * Default property
+     *
+     * @var mixed
+     */
     private string $uri = '';
     private $client = null;
     private $cache = [];
@@ -73,9 +78,14 @@ class Engine
      */
     public function doUpgrade(string $branch, string $from, string $to):void
     {
+        // Hidden iframe element
         $this->turnOffVerbose();
+
+        // Hide all SLiMS Menu
         $this->turnOffMenu();
+        
         try {
+            // PHP extension check
             $this->checkExt();
             
             // Writable scandir
@@ -87,18 +97,22 @@ class Engine
             // no limit
             set_time_limit(0);
 
-            // Get new file
             $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh data perubahan</strong></br>');
+            // Get new diff file from github
             $this->downloadDiff($branch);
-            $new = $this->diffParser($branch, SB . 'files/cache/SLiMS.diff');
+
+            // Parse diff file
+            $new = $this->diffParse($branch, SB . 'files/cache/SLiMS.diff');
 
             // Download latest
             $this->downloadLatestPackages(($branch != 'develop' ? $lastVersion : 'develop'));
             $this->unzip(($branch != 'develop' ? $lastVersion : 'develop'));
 
             // Reset last connection
-            Client::reset(); $this->createConnection();
+            Client::reset(); 
+            $this->createConnection();
 
+            // Reset precentation
             $this->setPercentProgress(0, 0);
             
             // total downloaded file

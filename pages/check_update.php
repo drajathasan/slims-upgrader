@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-22 09:41:14
+ * @modify date 2022-11-22 14:52:03
  * @license GPLv3
  * @desc [description]
  */
@@ -12,6 +12,7 @@ defined('INDEX_AUTH') OR die('Direct access not allowed!');
 
 use SLiMS\Json;
 use SLiMS\Http\Client;
+use Drajathasan\SlimsUpgrader\Html;
 
 // IP based access limitation
 require LIB . 'ip_based_access.inc.php';
