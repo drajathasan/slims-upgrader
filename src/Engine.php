@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-21 23:25:22
+ * @modify date 2022-11-22 10:14:43
  * @license GPLv3
  * @desc [description]
  */
@@ -83,7 +83,7 @@ class Engine
 
             // Check latest version
             $lastVersion = $this->checkLatestVersion($branch);
-
+            
             // no limit
             set_time_limit(0);
 
@@ -93,8 +93,8 @@ class Engine
             $new = $this->diffParser($branch, SB . 'files/cache/SLiMS.diff');
 
             // Download latest
-            $this->downloadLatestPackages($branch);
-            dd(scandir(SB . 'files/cache/'));
+            $this->downloadLatestPackages(($branch != 'develop' ? $lastVersion : 'develop'));
+            $this->unzip(($branch != 'develop' ? $lastVersion : 'develop'));
 
             // Reset last connection
             Client::reset(); $this->createConnection();
@@ -107,6 +107,7 @@ class Engine
             $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh dan memasang berkas pembaharuan</strong></br>');
 
             $this->cache = [];
+            $rootPath = SB . 'files/cache/slims9_bulian-' . trim($lastVersion, 'v') . DS;
             foreach ($new as $index => $newUpdate) {
                 // Make a cache
                 $this->cache[$index] = [
@@ -117,10 +118,14 @@ class Engine
                     'error_message' => ''
                 ];
 
-                $download = Client::download($newUpdate['url']);
+                // Migrating #1 schema
+                // $download = Client::download($newUpdate['url']);
                 
                 // migrating data
-                $this->migrate($index, $from, $download, $newUpdate['file'], $newUpdate['status']);
+                // $this->migrate($index, $from, $download, $newUpdate['file'], $newUpdate['status']);
+
+                // Local migration
+                $this->migrateFromLocal($index, trim($from, 'v'), $rootPath, $newUpdate['file'], $newUpdate['status']);
 
                 // Show output
                 $this->setPercentProgress(($index + 1), $total);
@@ -137,7 +142,8 @@ class Engine
             $this->progressMessage('<strong style="padding: 10px; color: black">Selesai memperbaharui basis data</strong></br>');
             $this->outputWithFlush('<strong style="padding: 10px; color: green">Selesai memperbaharui basis data</strong></br>');
             $this->progressMessage('<strong style="padding: 10px; color: green">Selesai memperbaharui SLiMS, anda akan logout dalam 5 detik</strong></br>');
-            // $this->logOut();
+            $this->delTree($rootPath);
+            $this->logOut();
             
         } catch (\Exception $e) {
             $this->progressMessage('<strong style="padding: 10px; color: red">' . $e->getMessage() . '</strong></br>');
@@ -194,6 +200,41 @@ class Engine
 
                 // save new file
                 $download->to(SB . $destination);
+            }
+
+            // deleted
+            if (preg_match('/(delete)|(remove)/i', $status)) unlink(SB . $destination);
+            
+        } catch (\Exception $e) {
+            $this->cache[$index]['download_status'] = false;
+            $this->cache[$index]['error_message'] = $e->getMessage();
+        }
+    }
+
+    /**
+     * Migrating file
+     *
+     * @param integer $index
+     * @param string $currentTag
+     * @param object $download
+     * @param string $destination
+     * @param string $status
+     * @return void
+     */
+    private function migrateFromLocal(int $index, string $currentTag, string $rootPath, string $destination, string $status)
+    {
+        try {
+            // new or update
+            if (in_array($status, ['modified','added']))
+            {
+                // be safe and make a backup
+                $originalPath = SB . $destination;
+                if (file_exists($originalPath)) copy($originalPath, $originalPath . $currentTag);
+                
+                if ($status == 'added' && !file_exists($path = dirname(SB . $destination))) $this->mkdir($path . DS);
+
+                // save new file
+                copy($rootPath . $destination, SB . $destination);
             }
 
             // deleted
@@ -278,12 +319,17 @@ class Engine
 
     private function downloadLatestPackages(string $branch)
     {
-        $path = SB . 'files/cache/' . $branch . '.zip';
-        $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh paket versi terbaru</strong></br>');
-        $this->setPercentProgress(50, 100);
-        Client::download('https://codeload.github.com/slims/slims9_bulian/zip/refs/heads/'.$branch)->to($path);
-        $this->progressMessage('<strong style="padding: 10px; color: black">Mengekstrak paket</strong></br>');
-        $this->unzip($path);
-        $this->setPercentProgress(100, 100);
+        $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh paket versi terbaru, silahkan tunggu</strong></br>');
+        
+        // Set url
+        $url = 'https://github.com/slims/slims9_bulian/releases/download/v9.5.1/slims9_bulian-' . trim($branch, 'v') . '.zip';
+        if ($branch == 'develop') $url = 'https://codeload.github.com/slims/slims9_bulian/zip/refs/heads/develop';
+        
+        Client::download($url)
+                ->withProgress(SB . 'files/cache/' . $branch . '.zip', function($totalSize, $currentSize) {
+                    $this->setPercentProgress($currentSize, $totalSize);
+                });
+
+        $this->setPercentProgress(0, 0);
     }
 }

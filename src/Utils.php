@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 17:37:00
- * @modify date 2022-11-21 23:17:10
+ * @modify date 2022-11-22 10:16:04
  * @license GPLv3
  * @desc [description]
  */
@@ -165,14 +165,21 @@ trait Utils
         HTML;
     }
 
-    public function unzip(string $path)
+    public function unzip(string $branch)
     {
+        $path = SB . 'files/cache/' . $branch . '.zip';
         $zip = new \ZipArchive;
         
         if ($zip->open($path) !== TRUE) throw new \Exception("Gagal mengesktrak file {$path}");
         
-        $zip->extractTo(SB . 'files' . DS . 'cache' . DS . 'latestVersion' . DS);
+        $zip->extractTo(SB . 'files' . DS . 'cache' . DS);
         $zip->close();
         @unlink($path);
     }
+
+    private function delTree($dir) {
+        $files = array_diff(scandir($dir), ['.','..']);
+        foreach ($files as $file) (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : unlink("$dir/$file");
+        return rmdir($dir);
+    } 
 }
