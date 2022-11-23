@@ -55,7 +55,7 @@ class SLiMS
     if ($returnType == 'bool')
     {
       // Minimum SLiMS PHP Extension requirement
-      return $this->isGdOk() && $this->isMbStringOk() && $this->isGettextOk() && $this->isPdoOk();
+      return $this->isGdOk() && $this->isMbStringOk() && $this->isGettextOk() && $this->isPdoOk() && $this->isCurlOk() && $this->isZipOk();
     }
 
     $message  = '<div class="flex flex-col">';
@@ -102,6 +102,11 @@ class SLiMS
   function isCurlOk()
   {
     return extension_loaded('curl');
+  }
+
+  function isZipOk()
+  {
+    return extension_loaded('zip');
   }
 
   function isMcryptOk()

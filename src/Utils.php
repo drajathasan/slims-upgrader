@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 17:37:00
- * @modify date 2022-11-23 16:08:31
+ * @modify date 2022-11-23 16:32:12
  * @license GPLv3
  * @desc [description]
  */
@@ -12,6 +12,14 @@ namespace Drajathasan\SlimsUpgrader;
 
 trait Utils
 {
+    /**
+     * method to get detail of changed files
+     * based on git diff
+     *
+     * @param string $branch
+     * @param string $filePath
+     * @return void
+     */
     public function diffParse(string $branch, string $filePath)
     {
         $fn = fopen($filePath,"r");
@@ -58,6 +66,7 @@ trait Utils
                 ($this->cache[$index]['download_status'] ? 'green' : 'red') . '">' . 
                 ($this->cache[$index]['download_status'] ? ___('Sukses mengupdate : ') . $this->cache[$index]['to'] : ___('Gagal : ') . $this->cache[$index]['error_message']) . 
             '</strong></br>';
+
         $js = <<<HTML
         <script>
             if (parent.$('#simpleDetail').hasClass('d-none'))
@@ -69,6 +78,12 @@ trait Utils
         $this->outputWithFlush($message . $js);
     }
 
+    /**
+     * set message outside verbose area
+     *
+     * @param string $stepMessage
+     * @return void
+     */
     private function progressMessage($stepMessage)
     {
         $message = <<<HTML
@@ -129,6 +144,12 @@ trait Utils
         
     }
 
+    /**
+     * Switching iframe visibility
+     *
+     * @param boolean $status
+     * @return void
+     */
     public function turnOffVerbose(bool $status = true)
     {
         if ($status)
@@ -144,6 +165,11 @@ trait Utils
         }
     }
 
+    /**
+     * Hide all SLiMS Menu
+     *
+     * @return void
+     */
     public function turnOffMenu()
     {
         echo <<<HTML
@@ -157,6 +183,12 @@ trait Utils
         flush();
     }
 
+    /**
+     * Redirect current page 
+     * into opac
+     *
+     * @return value
+     */
     public function logOut()
     {
         $url = AWB . 'logout.php';
@@ -165,6 +197,12 @@ trait Utils
         HTML;
     }
 
+    /**
+     * Extract zip file
+     *
+     * @param string $branch
+     * @return void
+     */
     public function unzip(string $branch)
     {
         $path = SB . 'files/cache/' . $branch . '.zip';
@@ -177,6 +215,12 @@ trait Utils
         @unlink($path);
     }
 
+    /**
+     * remove extracted folder
+     *
+     * @param string $dir
+     * @return void
+     */
     private function delTree($dir) {
         $files = array_diff(scandir($dir), ['.','..']);
         foreach ($files as $file) (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : unlink("$dir/$file");
