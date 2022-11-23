@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-22 16:08:09
+ * @modify date 2022-11-23 16:21:52
  * @license GPLv3
  * @desc [description]
  */
@@ -97,7 +97,7 @@ class Engine
             // no limit
             set_time_limit(0);
 
-            $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh data perubahan</strong></br>');
+            $this->progressMessage('<strong style="padding: 10px; color: black">'.___('Mengunduh data perubahan').'</strong></br>');
             // Get new diff file from github
             $this->downloadDiff($branch);
 
@@ -118,7 +118,7 @@ class Engine
             // total downloaded file
             $total = count($new);
 
-            $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh dan memasang berkas pembaharuan</strong></br>');
+            $this->progressMessage('<strong style="padding: 10px; color: black">' . ___('Mengunduh dan memasang berkas pembaharuan') . '</strong></br>');
 
             $this->cache = [];
             $rootPath = SB . 'files/cache/slims9_bulian-' . trim($lastVersion, 'v') . DS;
@@ -145,17 +145,17 @@ class Engine
                 $this->setPercentProgress(($index + 1), $total);
                 $this->showMessage($index);
 
-                if ($total == ($index + 1)) $this->outputWithFlush('<strong style="padding: 10px; color: green">Selesai mendownload</strong></br>');
+                if ($total == ($index + 1)) $this->outputWithFlush('<strong style="padding: 10px; color: green">' . ___('Selesai mendownload') . '</strong></br>');
             }
-            $this->progressMessage('<strong style="padding: 10px; color: black">Selesai memasang pembaharuan</strong></br>');
+            $this->progressMessage('<strong style="padding: 10px; color: black">' . ___('Selesai memasang pembaharuan') . '</strong></br>');
             sleep(2);
-            $this->progressMessage('<strong style="padding: 10px; color: black">Memperbaharui basis data</strong></br>');
+            $this->progressMessage('<strong style="padding: 10px; color: black">' . ___('Memperbaharui basis data') . '</strong></br>');
 
             $this->upgradeDatabase($from);
 
-            $this->progressMessage('<strong style="padding: 10px; color: black">Selesai memperbaharui basis data</strong></br>');
-            $this->outputWithFlush('<strong style="padding: 10px; color: green">Selesai memperbaharui basis data</strong></br>');
-            $this->progressMessage('<strong style="padding: 10px; color: green">Selesai memperbaharui SLiMS, anda akan logout dalam 5 detik</strong></br>');
+            $this->progressMessage('<strong style="padding: 10px; color: black">' . ___('Selesai memperbaharui basis data') . '</strong></br>');
+            $this->outputWithFlush('<strong style="padding: 10px; color: green">' . ___('Selesai memperbaharui basis data') . '</strong></br>');
+            $this->progressMessage('<strong style="padding: 10px; color: green">' . ___('Selesai memperbaharui SLiMS, anda akan logout dalam 5 detik') . '</strong></br>');
             $this->delTree($rootPath);
             $this->logOut();
             
@@ -268,7 +268,7 @@ class Engine
      */
     private function upgradeDatabase(string $previousVersion)
     {
-        $this->outputWithFlush('<div style="color: lightblue"><strong>Meningkatkan basis data</strong></div>');
+        $this->outputWithFlush('<div style="color: lightblue"><strong>' . ___('Meningkatkan basis data') . '</strong></div>');
         
         include_once __DIR__ . '/SLiMS.inc.php';
         include_once __DIR__ . '/Upgrade.inc.php';
@@ -276,7 +276,7 @@ class Engine
             if ($data['version'] == $previousVersion) return true;
         }))[0]['value']??'0';
 
-        if ($version == 0) exit($this->outputWithFlush('<div style="padding: 10px; color: red">Versi SLiMS anda tidak diketahui!</div>'));
+        if ($version == 0) exit($this->outputWithFlush('<div style="padding: 10px; color: red">' . ___('Versi SLiMS anda tidak diketahui!') . '</div>'));
 
         $slims = new \Install\SLiMS();
         $slims->createConnection();
@@ -303,7 +303,7 @@ class Engine
 
         // set data
         $data = $latest->toArray();
-        if (SENAYAN_VERSION_TAG === $data['tag_name']) throw new Exception('info::SLiMS anda sudah paling baru');
+        if (SENAYAN_VERSION_TAG === $data['tag_name']) throw new Exception('info::' . ___('SLiMS anda sudah paling baru'));
         
         // return latest release
         return $data['tag_name'];
@@ -333,7 +333,7 @@ class Engine
 
     private function downloadLatestPackages(string $branch)
     {
-        $this->progressMessage('<strong style="padding: 10px; color: black">Mengunduh paket versi terbaru, silahkan tunggu</strong></br>');
+        $this->progressMessage('<strong style="padding: 10px; color: black">' . ___('Mengunduh paket versi terbaru, silahkan tunggu') . '</strong></br>');
         
         // Set url
         $url = 'https://github.com/slims/slims9_bulian/releases/download/v9.5.1/slims9_bulian-' . trim($branch, 'v') . '.zip';
@@ -345,5 +345,12 @@ class Engine
                 });
 
         $this->setPercentProgress(0, 0);
+    }
+
+    public static function __callStatic($method, $arguments)
+    {
+        $static = new static('');
+        
+        if (method_exists($static, $method)) return $static->{$method}(...$arguments);
     }
 }

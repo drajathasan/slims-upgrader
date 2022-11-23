@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 07:34:13
- * @modify date 2022-11-21 15:13:08
+ * @modify date 2022-11-23 16:16:51
  * @license GPLv3
  * @desc [description]
  */
@@ -17,7 +17,6 @@ trait Guard
         $listOfDir = [];
         foreach (array_diff(scandir($dir), ['.','..','.git']) as $content) {
             $path = $dir . $content;
-    
             if (is_dir($path)) {
                 $listOfDir[] = $path;
                 foreach ($this->getAllDirPath($path . DS) as $innerContent) 
@@ -54,19 +53,19 @@ trait Guard
                 $slims->phpExtensionCheck('bool'),
             'detail' => [
                 'php' => [
-                    'title' => 'PHP Version',
+                    'title' => ___('PHP Version'),
                     'status' => $slims->isPhpOk($php_minimum_version),
                     'version' => phpversion(),
-                    'data' => 'Minimum PHP version to install SLiMS is ' . $php_minimum_version . '. Please upgrade it first!'
+                    'data' => str_replace('{phpversion}', ___('Minimum PHP version to install SLiMS is {phpversion}. Please upgrade it first!'))
                 ],
                 'database' => [
-                    'title' => 'Database driver',
+                    'title' => ___('Database driver'),
                     'status' => $slims->databaseDriverType(),
                     'version' => $slims->databaseDriverType(),
-                    'data' => 'SLiMS required MYSQL for database management. Please install it first!'
+                    'data' => ___('SLiMS required MYSQL for database management. Please install it first!')
                 ],
                 'phpextension' => [
-                    'title' => 'PHP Extension',
+                    'title' => ___('PHP Extension'),
                     'status' => '',
                     'version' => '*',
                     'data' => $slims->phpExtensionCheck()
@@ -77,7 +76,7 @@ trait Guard
         if (!$data['is_pass'])
         {
             $message  = '<div class="w-full">';
-            $message .= '<h2>Galat</h2>';
+            $message .= '<h2>' . ___('Galat') . '</h2>';
             $message .= '<ull>';
             foreach ($data['detail'] as $section => $detail) {
                 extract($detail);
@@ -102,16 +101,21 @@ trait Guard
     {
         $list = '';
         foreach ($error as $basePath => $listPath) {
-          $list .= '<li>' . trim(SB . $basePath . ' ' . (count($listPath) ? ' dan direktori didalamnya.' : '')) . '</li>';
+          $list .= '<li>' . trim(SB . $basePath . ' ' . (count($listPath) ? ___(' dan direktori didalamnya.') : '')) . '</li>';
         }  
 
         $user = (function_exists('posix_getpwuid') && function_exists('posix_geteuid')) ? (posix_getpwuid(posix_geteuid())['name']??'foo') : 'foo';
+        list($paragraph, $example, $errorHeader) = [
+            ___('Plugin ini membutuhkan izin untuk menulis file diseluruh folder yang ada di SLiMS<br>berikut direktori yang tidak dapat ditulis:'),
+            ___('Solusi (contoh)'),
+            ___('Galat')
+        ];
         $message = <<<HTML
         <div>
-            <h3>Galat</h3>
-            <p>Plugin ini membutuhkan izin untuk menulis file diseluruh folder yang ada di SLiMS<br>berikut direktori yang tidak dapat ditulis:</p>
+            <h3>{$errorHeader}</h3>
+            <p>{$paragraph}</p>
             <ul>{$list}</ul>
-            <strong style="width: 100%; display: block">Solusi (contoh):</strong>
+            <strong style="width: 100%; display: block">{$example}:</strong>
             <code>sudo chown {$user}:{$user} -R /var/www/html/template/</code>
         </div>
         HTML;

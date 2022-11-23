@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 17:37:00
- * @modify date 2022-11-22 11:09:51
+ * @modify date 2022-11-23 16:08:31
  * @license GPLv3
  * @desc [description]
  */
@@ -56,7 +56,7 @@ trait Utils
     {
         $message = '<strong style="padding: 10px; color: ' . 
                 ($this->cache[$index]['download_status'] ? 'green' : 'red') . '">' . 
-                ($this->cache[$index]['download_status'] ? 'Sukses mengupdate : ' . $this->cache[$index]['to'] : 'Gagal : ' . $this->cache[$index]['error_message']) . 
+                ($this->cache[$index]['download_status'] ? ___('Sukses mengupdate : ') . $this->cache[$index]['to'] : ___('Gagal : ') . $this->cache[$index]['error_message']) . 
             '</strong></br>';
         $js = <<<HTML
         <script>
@@ -170,7 +170,7 @@ trait Utils
         $path = SB . 'files/cache/' . $branch . '.zip';
         $zip = new \ZipArchive;
         
-        if ($zip->open($path) !== TRUE) throw new \Exception("Gagal mengesktrak file {$path}");
+        if ($zip->open($path) !== TRUE) throw new \Exception(___('Gagal mengesktrak file') . " {$path}");
         
         $zip->extractTo(SB . 'files' . DS . 'cache' . DS);
         $zip->close();

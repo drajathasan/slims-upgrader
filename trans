@@ -1,0 +1,9 @@
+#!/usr/bin/php
+<?php
+use Drajathasan\SlimsUpgrader\Translate;
+require __DIR__ . '/vendor/autoload.php';
+
+define('DS', DIRECTORY_SEPARATOR);
+
+$itemToTranslate = Translate::getTranslateString(Translate::getFile(__DIR__ . '/', ['.','..','.git','vendor']));
+Translate::makeTranslate($_SERVER['argv'][1]??'id_ID', $itemToTranslate);

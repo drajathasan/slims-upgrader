@@ -28,7 +28,7 @@ if (!function_exists('generateTemplate'))
                         Html::td(
                             Html::h6($message) . 
                             Html::div(
-                                Html::span('Waktu pembaharuan : ', ['class' => 'text-muted']) . 
+                                Html::span(___('Waktu pembaharuan : '), ['class' => 'text-muted']) . 
                                 Html::strong($date),
                             ['class' => 'd-flex flex-row'])
                         )
@@ -74,5 +74,15 @@ if (!function_exists('xssFree'))
     function xssFree($str_char)
     {
         return str_replace(['\'', '"'], '', strip_tags($str_char));
+    }
+}
+
+if (!function_exists('___'))
+{
+    function ___($message)
+    {
+        global $sysconf;
+        include_once __DIR__ . '/translate.php';
+        return isset($translate[$sysconf['default_lang']]) ? ($translate[$sysconf['default_lang']][$message]??$message) : $message;
     }
 }

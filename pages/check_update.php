@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-22 14:52:03
+ * @modify date 2022-11-23 15:58:33
  * @license GPLv3
  * @desc [description]
  */
@@ -57,7 +57,7 @@ if (isset($_GET['upgrade']))
     if (empty($_GET['from']) || empty($_GET['to']))
     {
         ob_start();
-        generateTemplate('danger', ['message' => 'Permintaan tidak valid']);
+        generateTemplate('danger', ['message' => ___('Permintaan tidak valid')]);
         $content = ob_get_clean();
         include SB . 'admin/admin_template/notemplate_page_tpl.php';
         exit;
@@ -75,25 +75,25 @@ if (isset($_GET['upgrade']))
 <div class="menuBox">
   <div class="menuBoxInner systemIcon">
     <div class="per_title">
-      <h2>Periksa Pembaharuan</h2>
+      <h2><?= ___('Periksa Pembaharuan') ?></h2>
     </div>
     <div class="sub_section">
         <form id="upgrade" action="<?= selfUrl() ?>" target="resultIframe" id="search" method="get" class="form-inline">
             <input type="hidden" name="id" value="<?= xssFree($_GET['id']) ?>"/>
             <input type="hidden" name="mod" value="<?= xssFree($_GET['mod']) ?>"/>
-            Dari cabang : &nbsp;&nbsp;&nbsp;
+            <?= ___('Dari cabang') ?> : &nbsp;&nbsp;&nbsp;
             <select name="branch" class="form-control">
                 <option value="master"><?= __('Stable') ?></option>
                 <option value="develop"><?= __('Development') ?></option>
             </select>
-            <input class="btn btn-secondary" type="submit" name="check" value="Cek"/>
+            <input class="btn btn-secondary" type="submit" name="check" value="<?= ___('Cek') ?>"/>
         </form>
         <div id="simpleDetail" class="d-none">
             <span id="ProgressStatus"></span>
             <div class="progress my-3">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
             </div>
-            <button id="showDetail" class="btn btn-secondary btn-sm">Lihat proses</button>
+            <button id="showDetail" class="btn btn-secondary btn-sm"><?= ___('Lihat proses') ?></button>
         </div>
     </div>
   </div>
@@ -105,13 +105,13 @@ if (isset($_GET['upgrade']))
     {
         $('#alert').removeClass('d-none')
         $('#alert').addClass('errorBox my-3 w-full d-block')
-        $('#alert').html('<strong>Anda tidak terkoneksi dengan internet! Plugin ini membutuhkan akses internet.</strong>')
+        $('#alert').html('<strong><?= ___('Anda tidak terkoneksi dengan internet! Plugin ini membutuhkan akses internet.') ?></strong>')
         $('input[name="check"]').attr('disabled', 'true')
     }
 
     $('#upgrade').submit(function(){
         $('iframe[name="resultIframe"]').removeClass('d-none');
-        toastr.info('proses sedang dimulai', 'Tunggu')
+        toastr.info('<?= ___('Proses sedang dimulai') ?>', '<?= ___('Tunggu') ?>')
     });
     $('.showFlush').click(function(){
         $('iframe[name="resultIframe"]').removeClass('d-none');
@@ -121,12 +121,12 @@ if (isset($_GET['upgrade']))
         
         if (iframe.hasClass('d-none'))
         {
-            $(this).html('Tutup detail')
+            $(this).html('<?= ___('Tutup detail') ?>')
             iframe.removeClass('d-none')
         }
         else
         {
-            $(this).html('Lihat proses')
+            $(this).html('<?= ___('Lihat proses') ?>')
             iframe.addClass('d-none')
         }
     });
