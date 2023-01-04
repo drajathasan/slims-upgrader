@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 17:37:00
- * @modify date 2022-11-23 16:32:12
+ * @modify date 2023-01-04 21:27:12
  * @license GPLv3
  * @desc [description]
  */
@@ -208,7 +208,34 @@ trait Utils
         $path = SB . 'files/cache/' . $branch . '.zip';
         $zip = new \ZipArchive;
         
-        if ($zip->open($path) !== TRUE) throw new \Exception(___('Gagal mengesktrak file') . " {$path}");
+        $errorMessage = [
+            1 => 'Multi-disk zip archives not supported',
+            'Renaming temporary file failed',
+            'Closing zip archive failed',
+            'Seek error',
+            'Read error',
+            'Write error',
+            'CRC error',
+            'Containing zip archive was closed',
+            'No such file',
+            'File already exists',
+            'Can\'t open file',
+            'Failure to create temporary file',
+            'Zlib error',
+            'Malloc failure',
+            'Entry has been changed',
+            'Compression method not supported',
+            'Premature EOF',
+            'Invalid argument',
+            'Not a zip archive',
+            'Internal error',
+            'Zip archive inconsistent',
+            'Can\'t remove file',
+            'Entry has been deleted'
+        ];
+
+        $process = $zip->open($path);
+        if ($process !== TRUE) throw new \Exception(___('Gagal mengesktrak file') . ' : ' . ($errorMessage[$process]??'An unknown error has occurred') . " {$path}");
         
         $zip->extractTo(SB . 'files' . DS . 'cache' . DS);
         $zip->close();

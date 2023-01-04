@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2022-11-23 16:21:52
+ * @modify date 2023-01-04 21:29:19
  * @license GPLv3
  * @desc [description]
  */
@@ -336,11 +336,12 @@ class Engine
         $this->progressMessage('<strong style="padding: 10px; color: black">' . ___('Mengunduh paket versi terbaru, silahkan tunggu') . '</strong></br>');
         
         // Set url
-        $url = 'https://github.com/slims/slims9_bulian/releases/download/v9.5.1/slims9_bulian-' . trim($branch, 'v') . '.zip';
+        $branch = trim($branch, 'v');
+        $url = 'https://github.com/slims/slims9_bulian/releases/download/v' . $branch . '/slims9_bulian-' . $branch . '.zip';
         if ($branch == 'develop') $url = 'https://codeload.github.com/slims/slims9_bulian/zip/refs/heads/develop';
         
         Client::download($url)
-                ->withProgress(SB . 'files/cache/' . $branch . '.zip', function($totalSize, $currentSize) {
+                ->withProgress(SB . 'files/cache/v' . $branch . '.zip', function($totalSize, $currentSize) {
                     $this->setPercentProgress($currentSize, $totalSize);
                 });
 

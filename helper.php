@@ -55,8 +55,7 @@ if (!function_exists('generateTemplate'))
                         Html::p('sebelum anda meningkatan versi SLiMS anda, pastikan anda sudah melakukan <i>backup</i> database dan source code SLiMS anda saat ini. Keberhasilan proses upgrade bergantung pada koneksi Internet dan stabilitas server anda.', ['style' => 'font-size: 12pt']),
                     ['class' => 'alert alert-warning']) . 
                     Html::input(['type' => 'submit', 'name' => 'upgrade', 'value' => 'Tingkatkan', 'class' => 'btn btn-primary']) . 
-                    $table . 
-                    Html::button('Tingkatakat', ['class' => 'btn btn-primary']),
+                    $table,
                 ['action' => selfUrl(['upgrade' => 'yes', 'from' => SENAYAN_VERSION_TAG, 'to' => $lastVersion])]);
                 break;
             
