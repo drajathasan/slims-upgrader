@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-17 22:14:43
- * @modify date 2023-01-07 19:10:59
+ * @modify date 2023-01-07 20:02:08
  * @license GPLv3
  * @desc [description]
  */
@@ -276,13 +276,15 @@ class Engine
             if ($data['version'] == $previousVersion) return true;
         }))[0]['value']??'0';
 
-        if ($version == 0) exit($this->outputWithFlush('<div style="padding: 10px; color: red">' . ___('Versi SLiMS anda tidak diketahui!') . '</div>'));
+        // if ($version == 0) exit($this->outputWithFlush('<div style="padding: 10px; color: red">' . ___('Versi SLiMS anda tidak diketahui!') . '</div>'));
 
-        $slims = new \Install\SLiMS();
-        $slims->createConnection();
-        $upgrade = \Install\Upgrade::init($slims)->from($version);
-        if (count($upgrade) > 0) $this->outputWithFlush('<div style="padding: 10px; color: red">' . $upgrade . '</div>');
-        
+        if ($version > 0)
+        {
+            $slims = new \Install\SLiMS();
+            $slims->createConnection();
+            $upgrade = \Install\Upgrade::init($slims)->from($version);
+            if (count($upgrade) > 0) $this->outputWithFlush('<div style="padding: 10px; color: red">' . $upgrade . '</div>');
+        }
     }
 
     /**
