@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 07:34:13
- * @modify date 2022-11-23 16:32:19
+ * @modify date 2023-01-07 19:07:10
  * @license GPLv3
  * @desc [description]
  */
@@ -74,7 +74,7 @@ trait Guard
                     'title' => ___('PHP Version'),
                     'status' => $slims->isPhpOk($php_minimum_version),
                     'version' => phpversion(),
-                    'data' => str_replace('{phpversion}', ___('Minimum PHP version to install SLiMS is {phpversion}. Please upgrade it first!'))
+                    'data' => str_replace('{phpversion}', '',___('Minimum PHP version to install SLiMS is {phpversion}. Please upgrade it first!'))
                 ],
                 'database' => [
                     'title' => ___('Database driver'),
