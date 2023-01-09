@@ -58,13 +58,14 @@ class SLiMS
       return $this->isGdOk() && $this->isMbStringOk() && $this->isGettextOk() && $this->isPdoOk() && $this->isCurlOk() && $this->isZipOk();
     }
 
-    $message  = '<div class="flex flex-col">';
-    $message .= $this->isGdOk() ? '<span>GD : installed</span>' : '<div>GD : <strong class="text-red-500">not installed. PHP GD required for image processing!</strong></div>';
-    $message .= $this->isMbStringOk() ? '<span>Mbstring : installed</span>' : '<divMbstring : <strong class="text-red-500">not installed. PHP Mbstring is used to convert strings to different encodings.</strong></div>';
-    $message .= $this->isGettextOk() ? '<span>Gettext : installed</span>' : '<div>Gettext : <strong class="text-red-500">not installed. PHP gettext required for translation to other language.</strong></div>';
-    $message .= $this->isPdoOk() ? '<span>PDO MySQL : installed</span>' : '<div>PDO : <strong class="text-red-500">not installed. PHP pdo required by some feature in SLiMS.</strong></div>';
+    $message  = '<div class="d-flex flex-column">';
+    if (!$this->isGdOk()) $message .=  '<div class="w-100">GD : <strong class="text-red-500">not installed. PHP GD required for image processing!</strong></div>';
+    if (!$this->isMbStringOk()) $message .= '<div class="w-100">Mbstring : <strong class="text-red-500">not installed. PHP Mbstring is used to convert strings to different encodings.</strong></div>';
+    if (!$this->isGettextOk()) $message .= '<div class="w-100">Gettext : <strong class="text-red-500">not installed. PHP gettext required for translation to other language.</strong></div>';
+    if (!$this->isPdoOk()) $message .= '<div class="w-100">PDO : <strong class="text-red-500">not installed. PHP pdo required by some feature in SLiMS.</strong></div>';
+    if (!$this->isCurlOk()) $message .= '<div class="w-100">cURL : <strong class="text-red-500">not installed. PHP cURL required by some feature in SLiMS.</strong></div>';
+    if (!$this->isZipOk()) $message .= '<div class="w-100">Zip : <strong class="text-red-500">not installed. PHP Zip required by some feature in SLiMS.</strong></div>';
     // Yaz is optional
-    $message .= $this->isYazOk() ? '<span>YAZ : installed</span>' : '<div>YAZ : <strong class="text-red-500">not installed. It\'s optional, but will be needed if you want to use Z39.50 protocol.</strong></div>';
     $message .= '</div>';
 
     return $message;

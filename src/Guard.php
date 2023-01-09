@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-19 07:34:13
- * @modify date 2023-01-07 19:07:10
+ * @modify date 2023-01-09 14:23:27
  * @license GPLv3
  * @desc [description]
  */
@@ -84,7 +84,7 @@ trait Guard
                 ],
                 'phpextension' => [
                     'title' => ___('PHP Extension'),
-                    'status' => '',
+                    'status' => $slims->phpExtensionCheck('bool'),
                     'version' => '*',
                     'data' => $slims->phpExtensionCheck()
                 ],      
@@ -97,6 +97,7 @@ trait Guard
             $message .= '<h2>' . ___('Galat') . '</h2>';
             $message .= '<ull>';
             foreach ($data['detail'] as $section => $detail) {
+                if ($detail['status']) continue;
                 extract($detail);
                 $message .= <<<HTML
                 <li>
