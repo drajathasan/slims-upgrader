@@ -72,62 +72,25 @@ if (isset($_GET['upgrade']))
 }
 
 ?>
-<div class="menuBox">
-  <div class="menuBoxInner systemIcon">
-    <div class="per_title">
-      <h2><?= ___('Periksa Pembaharuan') ?></h2>
-    </div>
-    <div class="sub_section">
-        <form id="upgrade" action="<?= selfUrl() ?>" target="resultIframe" id="search" method="get" class="form-inline">
-            <input type="hidden" name="id" value="<?= xssFree($_GET['id']) ?>"/>
-            <input type="hidden" name="mod" value="<?= xssFree($_GET['mod']) ?>"/>
-            <?= ___('Dari cabang') ?> : &nbsp;&nbsp;&nbsp;
-            <select name="branch" class="form-control">
-                <option value="master"><?= __('Stable') ?></option>
-                <option value="develop"><?= __('Development') ?></option>
-            </select>
-            <input class="btn btn-secondary" type="submit" name="check" value="<?= ___('Cek') ?>"/>
-        </form>
-        <div id="simpleDetail" class="d-none">
-            <span id="ProgressStatus"></span>
-            <div class="progress my-3">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+<section class="w-100 d-flex">
+    <div class="col-2 d-flex justify-content-center align-items-end" style="height: 100vh; background: #2ec27e; /* fallback for old browsers */">
+        <div class="d-flex justify-content-center">
+            <svg width="65" height="65" class="mb-5" version="1.1" viewBox="0 0 66.146 66.146" xmlns="http://www.w3.org/2000/svg">
+                <path d="m33.073 0a33.073 33.073 0 0 0-33.073 33.073 33.073 33.073 0 0 0 33.073 33.073 33.073 33.073 0 0 0 33.073-33.073 33.073 33.073 0 0 0-33.073-33.073zm-0.01183 10.659c0.30737 0.0042 0.62283 0.08733 0.89784 0.2534l17.439 10.296c0.03219 0 0.03219 0.03327 0.06473 0.03327 0.42061 0.29893 0.71125 0.76382 0.7438 1.2953v20.759h5.29e-4c0 0.06639 0.03237 0.09995-0.03237 0.16635v0.13262c-0.03237 0.46501-0.29128 0.93025-0.67954 1.2292-0.09706 0.06638-0.19408 0.13263-0.29123 0.1659l-17.439 10.33c-0.22648 0.09968-0.45305 0.16635-0.7119 0.16635-0.25883 0-0.51777-0.06632-0.7766-0.19916l-0.09711-0.06659-17.439-10.33c0-0.03314-0.03236-0.03328-0.06472-0.06654-0.42061-0.29894-0.71189-0.76383-0.74425-1.2953v-20.926c0.03235-0.53145 0.29128-0.99637 0.67953-1.3285l0.12944-0.06654 17.471-10.33c0.24266-0.14945 0.54216-0.2243 0.84953-0.22014zm-10.944 7.7264-6.7297 3.9861c-0.09706 0.06644-0.16179 0.16612-0.16179 0.29898v20.793c0 0.13286 0.06474 0.23257 0.19415 0.29898l6.6974 3.9856 10.968-6.51 10.968 6.51 6.665-3.9523s0.03219-3e-6 0.06473-0.03327c0.09703-0.06642 0.16179-0.19929 0.16179-0.29898v-20.826c-0.03237-0.13287-0.0971-0.23257-0.19415-0.29898h-0.03237l-6.665-3.9528-10.968 6.5105zm-0.71189 1.1959 23.36 13.85v13.087l-23.36-13.818z" fill="#fff" stroke-width="1.5927"/>
+            </svg>
+            <div class="d-flex flex-column text-white ml-2">
+                <h3 class="font-weight-bold">Upgrader</h3>
+                <h6>v2.0.0</h6>
             </div>
-            <button id="showDetail" class="btn btn-secondary btn-sm"><?= ___('Lihat proses') ?></button>
         </div>
     </div>
-  </div>
-  <div id="alert" class="d-none"></div>
-</div>
-<iframe id="blackBoard" name="resultIframe" class="d-non" style="height: 100vh"></iframe>
+    <div id="upgraderContent" class="col-8" style="height: 100vh">
+        <?php include __DIR__ . DS . 'sections' . DS . 'welcome.php'; ?>
+    </div>
+</section>
 <script>
-    if (!navigator.onLine)
-    {
-        $('#alert').removeClass('d-none')
-        $('#alert').addClass('errorBox my-3 w-full d-block')
-        $('#alert').html('<strong><?= ___('Anda tidak terkoneksi dengan internet! Plugin ini membutuhkan akses internet.') ?></strong>')
-        $('input[name="check"]').attr('disabled', 'true')
-    }
-
-    $('#upgrade').submit(function(){
-        $('iframe[name="resultIframe"]').removeClass('d-none');
-        toastr.info('<?= ___('Proses sedang dimulai') ?>', '<?= ___('Tunggu') ?>')
-    });
-    $('.showFlush').click(function(){
-        $('iframe[name="resultIframe"]').removeClass('d-none');
-    });
-    $('#showDetail').click(function(){
-        let iframe = $('#blackBoard')
-        
-        if (iframe.hasClass('d-none'))
-        {
-            $(this).html('<?= ___('Tutup detail') ?>')
-            iframe.removeClass('d-none')
-        }
-        else
-        {
-            $(this).html('<?= ___('Lihat proses') ?>')
-            iframe.addClass('d-none')
-        }
-    });
+    $('#sidepan').remove()
+    $('#header').remove()
+    $('#help').remove()
+    $('#mainContent').attr('style', 'margin-left: 0px !important')
 </script>
