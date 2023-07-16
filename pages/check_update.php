@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2022-11-23 15:58:33
+ * @modify date 2023-07-16 17:43:59
  * @license GPLv3
  * @desc [description]
  */
@@ -71,10 +71,16 @@ if (isset($_GET['upgrade']))
     exit;
 }
 
+if (isset($_GET['page'])) {
+    $page = basename($_GET['page']);
+    if ($page != 'welcome') $_SESSION['page'] = $page;
+    include __DIR__ . '/sections/' . $page . '.php';
+    exit;
+}
 ?>
 <section class="w-100 d-flex">
     <div class="col-2 d-flex justify-content-center align-items-end" style="height: 100vh; background: #2ec27e; /* fallback for old browsers */">
-        <div class="d-flex justify-content-center">
+        <a href="<?= selfUrl(['page' => $_SESSION['page']??'welcome']) ?>" class="upgraderLink d-flex justify-content-center notAJAX">
             <svg width="65" height="65" class="mb-5" version="1.1" viewBox="0 0 66.146 66.146" xmlns="http://www.w3.org/2000/svg">
                 <path d="m33.073 0a33.073 33.073 0 0 0-33.073 33.073 33.073 33.073 0 0 0 33.073 33.073 33.073 33.073 0 0 0 33.073-33.073 33.073 33.073 0 0 0-33.073-33.073zm-0.01183 10.659c0.30737 0.0042 0.62283 0.08733 0.89784 0.2534l17.439 10.296c0.03219 0 0.03219 0.03327 0.06473 0.03327 0.42061 0.29893 0.71125 0.76382 0.7438 1.2953v20.759h5.29e-4c0 0.06639 0.03237 0.09995-0.03237 0.16635v0.13262c-0.03237 0.46501-0.29128 0.93025-0.67954 1.2292-0.09706 0.06638-0.19408 0.13263-0.29123 0.1659l-17.439 10.33c-0.22648 0.09968-0.45305 0.16635-0.7119 0.16635-0.25883 0-0.51777-0.06632-0.7766-0.19916l-0.09711-0.06659-17.439-10.33c0-0.03314-0.03236-0.03328-0.06472-0.06654-0.42061-0.29894-0.71189-0.76383-0.74425-1.2953v-20.926c0.03235-0.53145 0.29128-0.99637 0.67953-1.3285l0.12944-0.06654 17.471-10.33c0.24266-0.14945 0.54216-0.2243 0.84953-0.22014zm-10.944 7.7264-6.7297 3.9861c-0.09706 0.06644-0.16179 0.16612-0.16179 0.29898v20.793c0 0.13286 0.06474 0.23257 0.19415 0.29898l6.6974 3.9856 10.968-6.51 10.968 6.51 6.665-3.9523s0.03219-3e-6 0.06473-0.03327c0.09703-0.06642 0.16179-0.19929 0.16179-0.29898v-20.826c-0.03237-0.13287-0.0971-0.23257-0.19415-0.29898h-0.03237l-6.665-3.9528-10.968 6.5105zm-0.71189 1.1959 23.36 13.85v13.087l-23.36-13.818z" fill="#fff" stroke-width="1.5927"/>
             </svg>
@@ -82,15 +88,21 @@ if (isset($_GET['upgrade']))
                 <h3 class="font-weight-bold">Upgrader</h3>
                 <h6>v2.0.0</h6>
             </div>
-        </div>
+        </a>
     </div>
-    <div id="upgraderContent" class="col-8" style="height: 100vh">
-        <?php include __DIR__ . DS . 'sections' . DS . 'welcome.php'; ?>
+    <div id="upgraderContent" class="col-10" style="height: 100vh">
+        <?php include __DIR__ . DS . 'sections' . DS . ($_SESSION['page']??'welcome') . '.php'; ?>
     </div>
 </section>
 <script>
     $('#sidepan').remove()
     $('#header').remove()
     $('#help').remove()
+    $('#footer').remove()
+    $('#mainContent').on('click', '.upgraderLink', function(e){
+        e.preventDefault()
+        let href = $(this).attr('href')
+        $('#upgraderContent').simbioAJAX(href)
+    });
     $('#mainContent').attr('style', 'margin-left: 0px !important')
 </script>
