@@ -3,7 +3,7 @@
  * @author Drajat Hasan
  * @email drajathasan20@gmail.com
  * @create date 2022-11-16 08:24:23
- * @modify date 2023-07-16 17:43:59
+ * @modify date 2023-07-17 16:58:30
  * @license GPLv3
  * @desc [description]
  */
@@ -13,6 +13,7 @@ defined('INDEX_AUTH') OR die('Direct access not allowed!');
 use SLiMS\Json;
 use SLiMS\Http\Client;
 use Drajathasan\SlimsUpgrader\Html;
+use GuzzleHttp\Client as GClient;
 
 // IP based access limitation
 require LIB . 'ip_based_access.inc.php';
@@ -25,6 +26,34 @@ require __DIR__ . '/../vendor/autoload.php';
 
 // Ignited engine
 $engine = new Drajathasan\SlimsUpgrader\Engine('https://api.github.com');
+
+if (isset($_GET['check_internet'])) {
+    try {
+        $client = new GClient;
+        $request = $client->request('GET', 'https://raw.githubusercontent.com/drajathasan/slims-upgrader-manifest/main/detail.json', [
+            'connect_timeout' => 10,
+            'headers' => ['User-Agent' => $_SERVER['HTTP_USER_AGENT']]
+        ]);
+    
+        if ($request->getStatusCode() == '200'): ?>
+            <h3 class="font-weight-bold text-muted">Selamat Data di Peningkat! 👋</h3>
+            <p style="font-size: 12pt">Sudah siap untuk mendapatkan fitur baru yang keren?</p>
+            <div class="d-flex flex-row">
+                <a href="<?= selfUrl(['page' => 'selectVersion', 'check_internet' => 'unset']) ?>" class="upgraderLink notAJAX btn btn-primary">Hayuk, Gaskeun</a>&nbsp;
+                <a href="<?= AWB ?>" class="btn btn-outline-secondary notAJAX">Ntar dulu ah</a>
+            </div>
+        <?php endif;
+    } catch (Exception $e) {
+        ?>
+            <h3 class="font-weight-bold text-muted">Yah, internet nya mati 😔</h3>
+            <p style="font-size: 12pt">meningkatankan versi SLiMS membutuhkan akses internet,</p>
+            <div class="d-flex flex-row">
+                <a href="<?= selfUrl(['page' => 'welcome']) ?>" class="upgraderLink btn btn-outline-secondary notAJAX">Coba lagi</a>
+            </div>
+        <?php
+    }
+    exit;
+}
 
 if (isset($_GET['branch']) && isset($_GET['check']))
 {

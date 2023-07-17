@@ -5,6 +5,11 @@ if (!function_exists('selfUrl'))
 {
     function selfUrl($query = [])
     {
+        foreach($query as $key => $value) {
+            if (isset($_GET[$key]) && $value == 'unset') unset($_GET[$key]);
+            else if (isset($_GET[$key])) $_GET[$key] = $value;
+        }
+
         return $_SERVER['PHP_SELF'] .'?'. http_build_query(array_unique(array_merge($_GET, $query)));
     }
 }
